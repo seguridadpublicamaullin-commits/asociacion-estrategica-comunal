@@ -55,11 +55,35 @@ if (typeof document !== 'undefined') {
   const form = document.querySelector('#search');
   const question = document.querySelector('#question');
   const answer = document.querySelector('#answer');
+  const localAI = document.querySelector('#local-ai');
+  const history = [];
   let passages;
   const show = (message) => { const p = document.createElement('p'); p.textContent = message; answer.replaceChildren(p); };
+  async function askModel(text, matches) {
+    const { answerLocally } = await import('./ia-local.mjs');
+    const result = await answerLocally(text, history, matches, show);
+    const card = document.createElement('article');
+    const body = document.createElement('p');
+    body.className = 'answer';
+    body.textContent = result.answer;
+    card.append(body);
+    for (const { page, title } of result.references) {
+      if (!Number.isInteger(page) || page < 2 || page > 14) continue;
+      const link = document.createElement('a');
+      link.href = 'guia-tecnica.pdf#page=' + page;
+      link.textContent = 'Guía técnica · pág. ' + page + ' · ' + title;
+      card.append(link, document.createElement('br'));
+    }
+    answer.replaceChildren(card);
+    history.push({ role: 'user', text }, { role: 'assistant', text: result.answer });
+    if (history.length > 4) history.splice(0, history.length - 4);
+  }
   form.addEventListener('submit', async (event) => {
     event.preventDefault();
-    if (!question.value.trim()) return;
+    const text = question.value.trim();
+    const submit = form.querySelector('button[type=submit]');
+    if (!text || submit.disabled) return;
+    submit.disabled = true;
     show('Buscando en la guía…');
     try {
       if (!passages) {
@@ -67,10 +91,24 @@ if (typeof document !== 'undefined') {
         if (!response.ok) throw new Error('No se pudo abrir la guía.');
         passages = parseGuide(await response.text());
       }
-      const matches = searchGuide(passages, question.value);
+      let matches = searchGuide(passages, text);
+      if (!matches.length && localAI.checked && history.length) {
+        matches = searchGuide(passages, history.at(-2).text);
+      }
       if (!matches.length) {
         show('No encontré un paso verificable. Indique el módulo, la etapa de instalación y el mensaje exacto del error.');
         return;
+      }
+      let fallback;
+      if (localAI.checked) {
+        try {
+          await askModel(text, matches);
+          return;
+        } catch (error) {
+          fallback = error.code === 'WEBGPU'
+            ? 'Este navegador o equipo no ofrece WebGPU. Aquí están los pasos de la guía.'
+            : 'La IA local no pudo preparar una respuesta respaldada. Aquí están los pasos de la guía.';
+        }
       }
       answer.replaceChildren(...matches.map(({title, chapter, content}) => {
         const card = document.createElement('article');
@@ -85,8 +123,15 @@ if (typeof document !== 'undefined') {
         card.append(heading, body, reference);
         return card;
       }));
+      if (fallback) {
+        const notice = document.createElement('p');
+        notice.textContent = fallback;
+        answer.prepend(notice);
+      }
     } catch {
       show('No se pudo cargar la guía. Intente otra vez o descárguela desde el enlace inferior.');
+    } finally {
+      submit.disabled = false;
     }
   });
   for (const button of form.querySelectorAll('button[type=button]')) {
