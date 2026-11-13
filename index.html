@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="es">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Asociación Estratégica Comunal | Asistente de integración S.E.C.</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#eef2f0;color:#192d2a;font:1rem/1.55 system-ui,sans-serif}
+main{max-width:780px;margin:0 auto;padding:4rem 1rem 2rem}header{border-top:5px solid #2b6256;padding:1.1rem 0}
+h1{line-height:1.13;margin:.3rem 0;font-size:clamp(2rem,6vw,3.4rem);letter-spacing:-.04em}p{margin:.5rem 0 1rem}
+form,article{background:white;border:1px solid #c9d5d1;border-radius:12px;padding:1.1rem;margin-bottom:1rem}
+label{font-weight:700}textarea{width:100%;font:inherit;padding:.65rem;margin:.45rem 0;border:1px solid #81978f;border-radius:6px;resize:vertical}
+button{font:inherit;cursor:pointer;border:1px solid #397566;padding:.45rem .7rem;border-radius:6px;background:white;color:#214c42}
+button[type=submit]{background:#265a4d;color:white;font-weight:700}button:focus-visible,a:focus-visible,textarea:focus-visible{outline:3px solid #1d7183;outline-offset:2px}
+.examples{display:flex;flex-wrap:wrap;gap:.45rem;margin:.7rem 0}.note,small{color:#425a54}.answer{white-space:pre-wrap;overflow-wrap:anywhere}
+h2{font-size:1.2rem;margin:0 0 .4rem} a{color:#205847}footer{margin-top:2rem}
+</style>
+<main>
+<header><small>ASOCIACIÓN ESTRATÉGICA COMUNAL</small><h1>Asistente de integración S.E.C.</h1>
+<p>Pregunte por la instalación, los servicios o un error. El asistente recupera pasos de la guía técnica y señala su sección.</p></header>
+<form id="search">
+<label for="question">¿En qué paso necesita ayuda?</label>
+<textarea id="question" rows="3" maxlength="500" required placeholder="Ej. La API responde, pero al iniciar sesión aparece Failed to fetch."></textarea>
+<div class="examples" aria-label="Preguntas de ejemplo">
+<button type="button">¿Cómo creo el primer administrador?</button><button type="button">¿Por qué sale Failed to fetch?</button><button type="button">¿Cómo conecto las planillas Microsoft?</button>
+</div>
+<button type="submit">Consultar la guía</button>
+<p class="note"><small>Use mensajes de error depurados. Omita contraseñas, tokens y datos personales.</small></p>
+</form>
+<section id="answer" aria-live="polite"></section>
+<footer><a href="guia-tecnica.pdf">Descargar la guía técnica de integración</a></footer>
+</main>
+<script type="module" src="assistant.mjs"></script>
+</html>
