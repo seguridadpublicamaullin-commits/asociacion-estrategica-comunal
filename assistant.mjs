@@ -1,6 +1,7 @@
 const normalize = (text) => text.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase();
 const stop = new Set('que quien cual como puedo podemos para del las los una uno con por donde cuando desde hacer debo quiero tengo sale esta este esto error problema sistema sec'.split(' '));
 const tokenize = (text) => normalize(text).match(/[a-z0-9_]{2,}/g)?.filter(word => !stop.has(word)) ?? [];
+const overviewQuery = /\b(?:conect\w*|configur\w*|integr\w*|instal\w*)\s+(?:el\s+|la\s+)?(?:todo|sistema(?:\s+completo)?)\b|\b(?:desde cero|por donde empiezo|primeros pasos|ruta de implementacion|guia completa)\b/;
 const shortcuts = [
   [/failed to fetch|cors/, 'La web muestra'],
   [/\bhealth\b.*(falla|caid|no responde)|api no (abre|responde)/, 'La API no abre'],
@@ -40,6 +41,10 @@ export function parseGuide(markdown) {
 export function searchGuide(passages, question) {
   const terms = [...new Set(tokenize(question))];
   const query = normalize(question);
+  if (overviewQuery.test(query)) {
+    return passages.filter(({ chapter, title }) => chapter.startsWith('01.') &&
+      ['Elija la prueba según su objetivo', 'Índice de trabajo'].includes(title));
+  }
   const target = shortcuts.find(([pattern]) => pattern.test(query))?.[1];
   return passages.map(passage => {
     const heading = new Set(tokenize(passage.title));
@@ -96,7 +101,7 @@ if (typeof document !== 'undefined') {
         matches = searchGuide(passages, history.at(-2).text);
       }
       if (!matches.length) {
-        show('No encontré un paso verificable. Indique el módulo, la etapa de instalación y el mensaje exacto del error.');
+        show('No encontré una sección para esa consulta. Si está empezando, elija «¿Cómo conecto todo?». Si ya está instalando, indique el componente que quiere conectar o el mensaje de error.');
         return;
       }
       let fallback;
