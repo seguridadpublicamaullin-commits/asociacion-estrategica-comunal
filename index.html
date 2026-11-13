@@ -24,10 +24,12 @@ h2{font-size:1.2rem;margin:0 0 .4rem} a{color:#205847}footer{margin-top:2rem}
 <button type="button">¿Cómo creo el primer administrador?</button><button type="button">¿Por qué sale Failed to fetch?</button><button type="button">¿Cómo conecto las planillas Microsoft?</button>
 </div>
 <button type="submit">Consultar la guía</button>
+<p><label><input type="checkbox" id="local-ai"> Usar IA en este navegador</label><br>
+<small>Requiere WebGPU. La primera consulta descarga un modelo de varios cientos de MB. Las preguntas se procesan en este equipo.</small></p>
 <p class="note"><small>Use mensajes de error depurados. Omita contraseñas, tokens y datos personales.</small></p>
 </form>
 <section id="answer" aria-live="polite"></section>
 <footer><a href="guia-tecnica.pdf">Descargar la guía técnica de integración</a></footer>
 </main>
-<script type="module" src="assistant.mjs"></script>
+<script type="module" src="assistant.mjs?v=2"></script>
 </html>
