@@ -60,7 +60,7 @@ if (typeof document !== 'undefined') {
   let passages;
   const show = (message) => { const p = document.createElement('p'); p.textContent = message; answer.replaceChildren(p); };
   async function askModel(text, matches) {
-    const { answerLocally } = await import('./ia-local.mjs');
+    const { answerLocally } = await import('./ia-local.mjs?v=3');
     const result = await answerLocally(text, history, matches, show);
     const card = document.createElement('article');
     const body = document.createElement('p');
@@ -105,6 +105,7 @@ if (typeof document !== 'undefined') {
           await askModel(text, matches);
           return;
         } catch (error) {
+          console.warn('Modo de IA local:', error?.message ?? String(error));
           fallback = error.code === 'WEBGPU'
             ? 'Este navegador o equipo no ofrece WebGPU. Aquí están los pasos de la guía.'
             : 'La IA local no pudo preparar una respuesta respaldada. Aquí están los pasos de la guía.';
